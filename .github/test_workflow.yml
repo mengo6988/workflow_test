@@ -1,0 +1,74 @@
+name: Sample Workflow to Test Step Failures
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        id: checkout
+        run: |
+          echo "Checking out code..."
+          # Simulate failure for testing purposes
+          # exit 1  # Remove this line to test successful execution
+
+      - name: Configure AWS CLI
+        id: aws_configure
+        run: |
+          echo "Configuring AWS CLI..."
+          # Simulate failure for testing purposes
+          # exit 1  # Remove this line to test successful execution
+
+      - name: Get latest release
+        id: get_release
+        run: |
+          echo "Getting latest release..."
+          # Simulate successful execution
+          echo "Successfully got latest release."
+
+      - name: Download release.zip
+        id: download_release
+        run: |
+          echo "Downloading release.zip..."
+          # Simulate successful execution
+          echo "Successfully downloaded release.zip."
+          exit 1
+
+      - name: Upload to S3
+        id: upload_s3
+        run: |
+          echo "Uploading to S3..."
+          # Simulate successful execution
+          echo "Successfully uploaded to S3."
+
+      - name: Deploy to AWS Amplify
+        id: deploy_amplify
+        run: |
+          echo "Deploying to AWS Amplify..."
+          # Simulate failure for testing purposes
+          exit 1  # Remove this line to test successful execution
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          FAILED_STEP=""
+          if [[ "${{ steps.checkout.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Checkout code"
+          elif [[ "${{ steps.aws_configure.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Configure AWS CLI"
+          elif [[ "${{ steps.get_release.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Get latest release"
+          elif [[ "${{ steps.download_release.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Download release.zip"
+          elif [[ "${{ steps.upload_s3.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Upload to S3"
+          elif [[ "${{ steps.deploy_amplify.outcome }}" == "failure" ]]; then
+            FAILED_STEP="Deploy to AWS Amplify"
+          fi
+          echo "Deployment failed at step: ${FAILED_STEP}"
+
